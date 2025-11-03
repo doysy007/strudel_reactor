@@ -1,6 +1,4 @@
-export const stranger_tune = `
-
-setcpm({CPM})
+export const stranger_tune = `setcps(140/60/4)
 
 samples('github:algorave-dave/samples')
 samples('https://raw.githubusercontent.com/tidalcycles/Dirt-Samples/master/strudel.json')
@@ -41,7 +39,7 @@ const arpeggiator2 = [
 const pattern = 0
 const bass = 0
 
-{Bassline}bassline:
+bassline:
 note(pick(basslines, bass))
 .sound("supersaw")
 .postgain(2)
@@ -51,7 +49,7 @@ note(pick(basslines, bass))
 .postgain(pick(gain_patterns, pattern))
 
 
-{Main_Arp}main_arp: 
+main_arp: 
 note(pick(arpeggiator1, "<0 1 2 3>/2"))
 .sound("supersaw")
 .lpf(300)
@@ -61,7 +59,7 @@ note(pick(arpeggiator1, "<0 1 2 3>/2"))
 .postgain(pick(gain_patterns, pattern))
 
 
-{Drums}drums:
+drums:
 stack(
   s("tech:5")
   .postgain(6)
@@ -79,7 +77,7 @@ stack(
   .postgain(.25),
 )
 
-{Drums2}drums2: 
+drums2: 
 stack(
   s("[~ hh]*4").bank("RolandTR808").room(0.3).speed(0.75).gain(1.2),
   s("hh").struct("x*16").bank("RolandTR808")
@@ -95,10 +93,8 @@ stack(
   .speed(0.5)
   .rarely(jux(rev)),
 )
-
-all(x => x.gain(mouseX.range(0,1)))
-
 //Remixed and reproduced from Algorave Dave's code found here: https://www.youtube.com/watch?v=ZCcpWzhekEY
+// all(x => x.gain(mouseX.range(0,1)))
 // all(x => x.log())
 
 // @version 1.2`;
