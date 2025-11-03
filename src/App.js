@@ -68,6 +68,8 @@ const handleD3Data = (event) => {
 export default function StrudelDemo() {
 
     const hasRun = useRef(false);
+    const [bpm, setBpm] = useState(140);
+    const [songText, setSongText] = useState(stranger_tune(140));
 
     const handlePlay = () => {
             globalEditor.evaluate();
@@ -77,7 +79,10 @@ export default function StrudelDemo() {
             globalEditor.stop();
         };
 
-    const [songText, setSongText] = useState(stranger_tune);
+    function handleBpm(newBpm) {
+        setBpm(newBpm);
+        setSongText(stranger_tune(newBpm));
+    };
 
     useEffect(() => {
 
@@ -112,11 +117,13 @@ export default function StrudelDemo() {
                     },
                 });
                 
-            document.getElementById('proc').value = stranger_tune
+            document.getElementById('proc').value = stranger_tune(bpm);
             // SetupButtons()
             // Proc()
         }
-        globalEditor.setCode(songText);
+        if (globalEditor != null) {
+            globalEditor.setCode(songText);
+        }
     }, [songText]);
 
 
@@ -145,7 +152,7 @@ export default function StrudelDemo() {
                             <div id="output" />
                         </div>
                         <div className="col-md-4">
-                            <DJControls />
+                            <DJControls bpm={bpm} onBpmChange={handleBpm} />
                         </div>
                     </div>
                 </div>

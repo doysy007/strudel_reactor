@@ -1,4 +1,5 @@
-export const stranger_tune = `setcps(140/60/4)
+export function stranger_tune(bpm) {
+    return `setcpm(${bpm}/4)
 
 samples('github:algorave-dave/samples')
 samples('https://raw.githubusercontent.com/tidalcycles/Dirt-Samples/master/strudel.json')
@@ -98,3 +99,4 @@ stack(
 // all(x => x.log())
 
 // @version 1.2`;
+}
