@@ -38,7 +38,6 @@ const handleD3Data = (event) => {
 // }
 
 
-
 // export function ProcAndPlay() {
 //     if (globalEditor != null && globalEditor.repl.state.started == true) {
 //         console.log(globalEditor)
@@ -69,7 +68,12 @@ export default function StrudelDemo() {
 
     const hasRun = useRef(false);
     const [bpm, setBpm] = useState(140);
-    const [songText, setSongText] = useState(stranger_tune(140));
+    const [drum1IsMuted, setDrum1IsMuted] = useState(false);
+    const [drum2IsMuted, setDrum2IsMuted] = useState(false);
+    const [basslineIsMuted, setBasslineIsMuted] = useState(false);
+    const [mainArpIsMuted, setMainArpIsMuted] = useState(false);
+
+    const [songText, setSongText] = useState(stranger_tune({ bpm: 140 }));
 
     const handlePlay = () => {
             globalEditor.evaluate();
@@ -79,10 +83,43 @@ export default function StrudelDemo() {
             globalEditor.stop();
         };
 
+    useEffect(() => {
+        const muteDrums1 = (drum1IsMuted) ? "_" : "";
+        const muteDrums2 = (drum2IsMuted) ? "_" : "";
+        const muteBassline = (basslineIsMuted) ? "_" : "";
+        const muteMainArp = (mainArpIsMuted) ? "_" : "";
+        setSongText(stranger_tune({ 
+            bpm, 
+            muteDrums1, 
+            muteDrums2, 
+            muteBassline, 
+            muteMainArp 
+        }));
+    }, [bpm, drum1IsMuted, drum2IsMuted, basslineIsMuted, mainArpIsMuted]);
+
     function handleBpm(newBpm) {
         setBpm(newBpm);
-        setSongText(stranger_tune(newBpm));
-    };
+    }
+
+    function handleMute(instrument, isMuted) {
+        console.log('handleMute called:', { instrument, isMuted });
+        switch (instrument) {
+            case 'drums1':
+                setDrum1IsMuted(isMuted);
+                console.log('Set drum1 mute to:', isMuted);
+                break;
+            case 'drums2':
+                setDrum2IsMuted(isMuted);
+                console.log('Set drum2 mute to:', isMuted);
+                break;
+            case 'bassline':
+                setBasslineIsMuted(isMuted);
+                break;
+            case 'mainArp':
+                setMainArpIsMuted(isMuted);
+                break;
+        }
+    }
 
     useEffect(() => {
 
@@ -117,7 +154,7 @@ export default function StrudelDemo() {
                     },
                 });
                 
-            document.getElementById('proc').value = stranger_tune(bpm);
+            document.getElementById('proc').value = songText;
             // SetupButtons()
             // Proc()
         }
@@ -125,7 +162,6 @@ export default function StrudelDemo() {
             globalEditor.setCode(songText);
         }
     }, [songText]);
-
 
     return (
         <div>
@@ -152,7 +188,7 @@ export default function StrudelDemo() {
                             <div id="output" />
                         </div>
                         <div className="col-md-4">
-                            <DJControls bpm={bpm} onBpmChange={handleBpm} />
+                            <DJControls bpm={bpm} onBpmChange={handleBpm} onMuteChange={handleMute} />
                         </div>
                     </div>
                 </div>
@@ -160,6 +196,5 @@ export default function StrudelDemo() {
             </main >
         </div >
     );
-
 
 }

@@ -1,4 +1,9 @@
-export function stranger_tune(bpm) {
+export function stranger_tune({ 
+  bpm = 140, 
+  muteDrums1 = "",
+  muteDrums2 = "", 
+  muteBassline = "", 
+  muteMainArp = "" }) {
     return `setcpm(${bpm}/4)
 
 samples('github:algorave-dave/samples')
@@ -40,7 +45,7 @@ const arpeggiator2 = [
 const pattern = 0
 const bass = 0
 
-bassline:
+${muteBassline}bassline:
 note(pick(basslines, bass))
 .sound("supersaw")
 .postgain(2)
@@ -50,7 +55,7 @@ note(pick(basslines, bass))
 .postgain(pick(gain_patterns, pattern))
 
 
-main_arp: 
+${muteMainArp}main_arp: 
 note(pick(arpeggiator1, "<0 1 2 3>/2"))
 .sound("supersaw")
 .lpf(300)
@@ -60,7 +65,7 @@ note(pick(arpeggiator1, "<0 1 2 3>/2"))
 .postgain(pick(gain_patterns, pattern))
 
 
-drums:
+${muteDrums1}drums:
 stack(
   s("tech:5")
   .postgain(6)
@@ -78,7 +83,7 @@ stack(
   .postgain(.25),
 )
 
-drums2: 
+${muteDrums2}drums2: 
 stack(
   s("[~ hh]*4").bank("RolandTR808").room(0.3).speed(0.75).gain(1.2),
   s("hh").struct("x*16").bank("RolandTR808")
