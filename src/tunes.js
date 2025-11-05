@@ -5,6 +5,8 @@ export function stranger_tune({
   muteBassline = "", 
   muteMainArp = "",
   basslineGain = 1.0,
+  mainArpGain = 1.0,
+  drums1Gain = 1.0,
   drums2Gain = 1.0
 }) {
     return `setcpm(${bpm}/4)
@@ -55,7 +57,8 @@ note(pick(basslines, bass))
 .room(0.6)
 .lpf(700)
 .room(0.4)
-.postgain(pick(gain_patterns, pattern).mul(${basslineGain})
+.postgain(pick(gain_patterns, pattern)
+.gain(${basslineGain})
 )
 
 
@@ -67,38 +70,39 @@ note(pick(arpeggiator1, "<0 1 2 3>/2"))
 .room(0.6)
 .lpenv(3.3)
 .postgain(pick(gain_patterns, pattern))
+.gain(${mainArpGain})
 
 
 ${muteDrums1}drums:
 stack(
   s("tech:5")
-  .postgain(6)
+  .postgain(6*${drums1Gain})
   .pcurve(2)
   .pdec(1)
   .struct(pick(drum_structure, pattern)),
 
   s("sh").struct("[x!3 ~!2 x!10 ~]")
-  .postgain(0.5).lpf(7000)
+  .postgain(0.5*${drums1Gain}).lpf(7000)
   .bank("RolandTR808")
   .speed(0.8).jux(rev).room(sine.range(0.1,0.4)).gain(0.6),
 
   s("{~ ~ rim ~ cp ~ rim cp ~!2 rim ~ cp ~ < rim ~ >!2}%8 *2")
   .bank("[KorgDDM110, OberheimDmx]").speed(1.2)
-  .postgain(.25),
+  .postgain(.25*${drums1Gain}),
 )
 
 ${muteDrums2}drums2: 
 stack(
-  s("[~ hh]*4").bank("RolandTR808").room(0.3).speed(0.75).gain(1.2),
+  s("[~ hh]*4").bank("RolandTR808").room(0.3).speed(0.75).gain(${1.2 * drums2Gain}),
   s("hh").struct("x*16").bank("RolandTR808")
-  .gain(0.6)
+  .gain(${0.6 * drums2Gain})
   .jux(rev)
   .room(sine.range(0.1,0.4))
-  .postgain(1).mul(${drums2Gain}),
+  .postgain(1),
   
   s("[psr:[2|5|6|7|8|9|12|24|25]*16]?0.1")
-  .gain(0.1)
-  .postgain(pick(gain_patterns, pattern).mul(${drums2Gain}))
+  .gain(${0.1 * drums2Gain})
+  .postgain(pick(gain_patterns, pattern))
   .hpf(1000)
   .speed(0.5)
   .rarely(jux(rev)),

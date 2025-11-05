@@ -1,15 +1,30 @@
 import React from 'react';
 
 function VolumeControl({ onVolumeChange }) {
+
+    const [volume, setVolume] = React.useState(1.0);
+    const [selectedInstrument, setSelectedInstrument] = React.useState('all');
+
+    function handleVolume(event) {    
+        const newVolume = parseFloat(event.target.value);     
+        setVolume(newVolume);
+        onVolumeChange(selectedInstrument, newVolume);
+    }
+
+    function handleSelectedInstrument(event) { 
+        setSelectedInstrument(event.target.value);
+    }
+
     return (
         <>
-            <select>
-                <option value="bassline">Bassline</option>
-                {/* <option value="main_arp">Main Arpeggiator</option>
-                <option value="drums1">Drums 1</option> */}
-                <option value="drums2">Drums 2</option>
+            <select className="form-select" value={selectedInstrument} onChange={handleSelectedInstrument}>
+                <option value="all">All Instruments Volume</option>
+                <option value="bassline">Bassline Volume</option>
+                <option value="mainArp">Main Arpeggiator Volume</option>
+                <option value="drums1">Drums 1 Volume</option>
+                <option value="drums2">Drums 2 Volume</option>
             </select>
-            <label htmlFor="volume_range" className="form-label">Volume</label>
+            <label htmlFor="volume_range" className="form-label">Volume: {volume}x</label>
             <input 
                 type="range" 
                 className="form-range" 
@@ -17,6 +32,8 @@ function VolumeControl({ onVolumeChange }) {
                 max="3" 
                 step="0.1" 
                 id="volume_range"
+                value={volume}
+                onChange={handleVolume}
             />
         </>
     );

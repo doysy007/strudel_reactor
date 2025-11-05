@@ -1,7 +1,7 @@
 import './App.css';
 import { useEffect, useRef, useState } from "react";
 import { StrudelMirror } from '@strudel/codemirror';
-import { evalScope } from '@strudel/core';
+import { evalScope, set } from '@strudel/core';
 import { drawPianoroll } from '@strudel/draw';
 import { initAudioOnFirstClick } from '@strudel/webaudio';
 import { transpiler } from '@strudel/transpiler';
@@ -73,48 +73,65 @@ export default function StrudelDemo() {
     const [basslineIsMuted, setBasslineIsMuted] = useState(false);
     const [mainArpIsMuted, setMainArpIsMuted] = useState(false);
     const [basslineGain, setBasslineGain] = useState(1.0);
+    const [mainArpGain, setMainArpGain] = useState(1.0);
+    const [drums1Gain, setDrums1Gain] = useState(1.0);
     const [drums2Gain, setDrums2Gain] = useState(1.0);
+
+    const [isPlaying, setIsPlaying] = useState(false);
 
     const [songText, setSongText] = useState(stranger_tune({ bpm: 140 }));
 
     const handlePlay = () => {
+        if (globalEditor != null) {
             globalEditor.evaluate();
-        };
+            setIsPlaying(true);
+        }
+    };
 
     const handleStop = () => {
+        if (globalEditor != null) {
             globalEditor.stop();
-        };
+            setIsPlaying(false);
+        }
+    };
 
     useEffect(() => {
         const muteDrums1 = (drum1IsMuted) ? "_" : "";
         const muteDrums2 = (drum2IsMuted) ? "_" : "";
         const muteBassline = (basslineIsMuted) ? "_" : "";
         const muteMainArp = (mainArpIsMuted) ? "_" : "";
-        setSongText(stranger_tune({ 
+        
+        const updatedSongText = stranger_tune({ 
             bpm, 
             muteDrums1, 
             muteDrums2, 
             muteBassline, 
             muteMainArp,
             basslineGain,
-            drums2Gain 
-        }));
-    }, [bpm, drum1IsMuted, drum2IsMuted, basslineIsMuted, mainArpIsMuted, basslineGain, drums2Gain]);
+            mainArpGain,
+            drums1Gain,
+            drums2Gain
+        });
+
+        setSongText(updatedSongText);
+
+        if (globalEditor != null && isPlaying) {
+            globalEditor.setCode(updatedSongText);
+            globalEditor.evaluate();
+        }
+    }, [bpm, drum1IsMuted, drum2IsMuted, basslineIsMuted, mainArpIsMuted, basslineGain, mainArpGain, drums1Gain, drums2Gain, isPlaying]);
 
     function handleBpm(newBpm) {
         setBpm(newBpm);
     }
 
     function handleMute(instrument, isMuted) {
-        console.log('handleMute called:', { instrument, isMuted });
         switch (instrument) {
             case 'drums1':
                 setDrum1IsMuted(isMuted);
-                console.log('Set drum1 mute to:', isMuted);
                 break;
             case 'drums2':
                 setDrum2IsMuted(isMuted);
-                console.log('Set drum2 mute to:', isMuted);
                 break;
             case 'bassline':
                 setBasslineIsMuted(isMuted);
@@ -126,7 +143,26 @@ export default function StrudelDemo() {
     }
 
     function handleVolume(instrument, volume) {
-
+        switch (instrument) {
+            case 'all':
+                setBasslineGain(volume);
+                setMainArpGain(volume);
+                setDrums1Gain(volume);
+                setDrums2Gain(volume);
+                break;
+            case 'bassline':
+                setBasslineGain(volume);
+                break;
+            case 'mainArp':
+                setMainArpGain(volume);
+                break;
+            case 'drums1':
+                setDrums1Gain(volume);
+                break;
+            case 'drums2':
+                setDrums2Gain(volume);
+                break;
+        }
     }
 
     useEffect(() => {
@@ -162,7 +198,7 @@ export default function StrudelDemo() {
                     },
                 });
                 
-            document.getElementById('proc').value = songText;
+            // document.getElementById('proc').value = songText;
             // SetupButtons()
             // Proc()
         }

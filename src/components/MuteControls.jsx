@@ -1,38 +1,38 @@
 import React from 'react';
 
 function MuteControls({ onMuteChange }) {
-    function switchDrum1Mute(event) {
+    function handleDrum1Mute(event) {
         onMuteChange('drums1', event.target.checked);
     }
 
-    function switchDrum2Mute(event) {
+    function handleDrum2Mute(event) {
         onMuteChange('drums2', event.target.checked);
     }
 
-    function switchBaseLineMute(event) {
+    function handleBassLineMute(event) {
         onMuteChange('bassline', event.target.checked);
     }
 
-    function switchMainArpMute(event) {
+    function handleMainArpMute(event) {
         onMuteChange('mainArp', event.target.checked);
     }
 
     return (
         <>
             <div className="form-check form-switch">
-                <input className="form-check-input" type="checkbox" onChange={switchBaseLineMute}/>
+                <input className="form-check-input" type="checkbox" onChange={handleBassLineMute}/>
                 <label className="form-check-label">Mute Bassline</label>
             </div>
             <div className="form-check form-switch">
-                <input className="form-check-input" type="checkbox" onChange={switchMainArpMute}/>
+                <input className="form-check-input" type="checkbox" onChange={handleMainArpMute}/>
                 <label className="form-check-label">Mute Main Arpeggiator</label>
             </div>
             <div className="form-check form-switch">
-                <input className="form-check-input" type="checkbox" onChange={switchDrum1Mute}/>
+                <input className="form-check-input" type="checkbox" onChange={handleDrum1Mute}/>
                 <label className="form-check-label">Mute Drums 1</label>
             </div>
             <div className="form-check form-switch">
-                <input className="form-check-input" type="checkbox" onChange={switchDrum2Mute}/>
+                <input className="form-check-input" type="checkbox" onChange={handleDrum2Mute}/>
                 <label className="form-check-label">Mute Drums 2</label>
             </div>
         </>
