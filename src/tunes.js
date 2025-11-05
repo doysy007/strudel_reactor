@@ -3,7 +3,10 @@ export function stranger_tune({
   muteDrums1 = "",
   muteDrums2 = "", 
   muteBassline = "", 
-  muteMainArp = "" }) {
+  muteMainArp = "",
+  basslineGain = 1.0,
+  drums2Gain = 1.0
+}) {
     return `setcpm(${bpm}/4)
 
 samples('github:algorave-dave/samples')
@@ -52,7 +55,8 @@ note(pick(basslines, bass))
 .room(0.6)
 .lpf(700)
 .room(0.4)
-.postgain(pick(gain_patterns, pattern))
+.postgain(pick(gain_patterns, pattern).mul(${basslineGain})
+)
 
 
 ${muteMainArp}main_arp: 
@@ -90,15 +94,16 @@ stack(
   .gain(0.6)
   .jux(rev)
   .room(sine.range(0.1,0.4))
-  .postgain(0.5),
+  .postgain(1).mul(${drums2Gain}),
   
   s("[psr:[2|5|6|7|8|9|12|24|25]*16]?0.1")
   .gain(0.1)
-  .postgain(pick(gain_patterns, pattern))
+  .postgain(pick(gain_patterns, pattern).mul(${drums2Gain}))
   .hpf(1000)
   .speed(0.5)
   .rarely(jux(rev)),
 )
+
 //Remixed and reproduced from Algorave Dave's code found here: https://www.youtube.com/watch?v=ZCcpWzhekEY
 // all(x => x.gain(mouseX.range(0,1)))
 // all(x => x.log())

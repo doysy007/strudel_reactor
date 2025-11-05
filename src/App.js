@@ -72,6 +72,8 @@ export default function StrudelDemo() {
     const [drum2IsMuted, setDrum2IsMuted] = useState(false);
     const [basslineIsMuted, setBasslineIsMuted] = useState(false);
     const [mainArpIsMuted, setMainArpIsMuted] = useState(false);
+    const [basslineGain, setBasslineGain] = useState(1.0);
+    const [drums2Gain, setDrums2Gain] = useState(1.0);
 
     const [songText, setSongText] = useState(stranger_tune({ bpm: 140 }));
 
@@ -93,9 +95,11 @@ export default function StrudelDemo() {
             muteDrums1, 
             muteDrums2, 
             muteBassline, 
-            muteMainArp 
+            muteMainArp,
+            basslineGain,
+            drums2Gain 
         }));
-    }, [bpm, drum1IsMuted, drum2IsMuted, basslineIsMuted, mainArpIsMuted]);
+    }, [bpm, drum1IsMuted, drum2IsMuted, basslineIsMuted, mainArpIsMuted, basslineGain, drums2Gain]);
 
     function handleBpm(newBpm) {
         setBpm(newBpm);
@@ -119,6 +123,10 @@ export default function StrudelDemo() {
                 setMainArpIsMuted(isMuted);
                 break;
         }
+    }
+
+    function handleVolume(instrument, volume) {
+
     }
 
     useEffect(() => {
@@ -176,7 +184,7 @@ export default function StrudelDemo() {
                         <div className="col-md-4">
 
                             <nav>
-                                <ProcButtons />
+                                {/* <ProcButtons /> */}
                                 <br />
                                 <PlayButton onPlay={handlePlay} onStop={handleStop}/>
                             </nav>
@@ -188,7 +196,12 @@ export default function StrudelDemo() {
                             <div id="output" />
                         </div>
                         <div className="col-md-4">
-                            <DJControls bpm={bpm} onBpmChange={handleBpm} onMuteChange={handleMute} />
+                            <DJControls 
+                                bpm={bpm} 
+                                onBpmChange={handleBpm} 
+                                onMuteChange={handleMute} 
+                                onVolumeChange={handleVolume}
+                            />
                         </div>
                     </div>
                 </div>
