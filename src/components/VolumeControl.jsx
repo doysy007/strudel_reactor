@@ -5,12 +5,14 @@ function VolumeControl({ onVolumeChange }) {
     const [volume, setVolume] = React.useState(1.0);
     const [selectedInstrument, setSelectedInstrument] = React.useState('all');
 
+    // Handler to update volume and pass selected instrument and updated volume to App.js.
     function handleVolume(event) {    
-        const newVolume = parseFloat(event.target.value);     
+        const newVolume = parseFloat(event.target.value); // Converts string to float  
         setVolume(newVolume);
         onVolumeChange(selectedInstrument, newVolume);
     }
 
+    // Handler to update state of selected instrument.
     function handleSelectedInstrument(event) { 
         setSelectedInstrument(event.target.value);
     }

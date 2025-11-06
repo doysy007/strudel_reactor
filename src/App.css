@@ -2,6 +2,19 @@
   text-align: center;
 }
 
+#controls {
+  background-color: #383838;
+  border-radius: 10px;
+}
+
+.title {
+  text-align: center;
+}
+
+main {
+  padding: 0 20px;
+}
+
 .App-logo {
   height: 40vmin;
   pointer-events: none;

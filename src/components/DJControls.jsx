@@ -3,6 +3,7 @@ import BPMControl from './BPMControl';
 import MuteControls from './MuteControls';
 import VolumeControl from './VolumeControl';
 
+// Parent component for BPMControl, MuteControls and VolumeControl.
 function DJControls({ bpm, onBpmChange, onMuteChange, onVolumeChange }) {
     return (
         <>

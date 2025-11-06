@@ -66,41 +66,56 @@ const handleD3Data = (event) => {
 
 export default function StrudelDemo() {
 
+    // State variables
     const hasRun = useRef(false);
+
+    // Bpm State variable
     const [bpm, setBpm] = useState(140);
+
+    // Mute State variables
     const [drum1IsMuted, setDrum1IsMuted] = useState(false);
     const [drum2IsMuted, setDrum2IsMuted] = useState(false);
     const [basslineIsMuted, setBasslineIsMuted] = useState(false);
     const [mainArpIsMuted, setMainArpIsMuted] = useState(false);
+
+    // Volume State variables
     const [basslineGain, setBasslineGain] = useState(1.0);
     const [mainArpGain, setMainArpGain] = useState(1.0);
     const [drums1Gain, setDrums1Gain] = useState(1.0);
     const [drums2Gain, setDrums2Gain] = useState(1.0);
 
+    // Playing State variable
     const [isPlaying, setIsPlaying] = useState(false);
 
-    const [songText, setSongText] = useState(stranger_tune({ bpm: 140 }));
+    // Song Text State variable
+    const [songText, setSongText] = useState(stranger_tune({ bpm }));
 
+    // Play button handler
     const handlePlay = () => {
         if (globalEditor != null) {
-            globalEditor.evaluate();
-            setIsPlaying(true);
+            globalEditor.evaluate(); // Starts playing the song
+            setIsPlaying(true); // Sets isPlaying state to true
         }
     };
 
+    // Stop button handler
     const handleStop = () => {
         if (globalEditor != null) {
-            globalEditor.stop();
-            setIsPlaying(false);
+            globalEditor.stop(); // Stops playing the song
+            setIsPlaying(false); // Sets isPlaying state to false
         }
     };
 
+    // Use effect updates the strudel code whenever any of the dependencies change.
     useEffect(() => {
+
+        // Sets the silence strings if instrument muted is true or false.
         const muteDrums1 = (drum1IsMuted) ? "_" : "";
         const muteDrums2 = (drum2IsMuted) ? "_" : "";
         const muteBassline = (basslineIsMuted) ? "_" : "";
         const muteMainArp = (mainArpIsMuted) ? "_" : "";
         
+        // Updates the song text based on current mute settings.
         const updatedSongText = stranger_tune({ 
             bpm, 
             muteDrums1, 
@@ -113,18 +128,24 @@ export default function StrudelDemo() {
             drums2Gain
         });
 
-        setSongText(updatedSongText);
+        setSongText(updatedSongText); // Sets the current song text to the updated song text.
 
+        // Allows the changes to take effect immediately upon change.
         if (globalEditor != null && isPlaying) {
             globalEditor.setCode(updatedSongText);
             globalEditor.evaluate();
         }
     }, [bpm, drum1IsMuted, drum2IsMuted, basslineIsMuted, mainArpIsMuted, basslineGain, mainArpGain, drums1Gain, drums2Gain, isPlaying]);
 
+
+    // Bpm handler
     function handleBpm(newBpm) {
         setBpm(newBpm);
     }
 
+    // Mute handler
+    // Sets instrument mute states to true or false based 
+    // on form switch input from Mute Controls component.
     function handleMute(instrument, isMuted) {
         switch (instrument) {
             case 'drums1':
@@ -142,6 +163,9 @@ export default function StrudelDemo() {
         }
     }
 
+    // Volume handler
+    // Sets the volume for the selected instrument 
+    // in the select list from Volume Control component.
     function handleVolume(instrument, volume) {
         switch (instrument) {
             case 'all':
@@ -209,35 +233,33 @@ export default function StrudelDemo() {
 
     return (
         <div>
-            <h2>Strudel Demo</h2>
+            <h2 className="title">Strudel Demo &#127925;</h2>
             <main>
-
                 <div className="container-fluid">
                     <div className="row">
-                        <div className="col-md-8" style={{ maxHeight: '50vh', overflowY: 'auto' }}>
-                            <PreProcessText defaultValue={songText} onChange={(e) => setSongText(e.target.value)}/>
+                        <div className="col-md-8">
+                            <div style={{ maxHeight: '50vh', overflowY: 'auto' }}>
+                                <PreProcessText defaultValue={songText} onChange={(e) => setSongText(e.target.value)}/>
+                            </div>
+                            <br />
+                            <div style={{ maxHeight: '50vh', overflowY: 'auto' }}>
+                                <div id="editor" />
+                                <div id="output" />
+                            </div>
                         </div>
-                        <div className="col-md-4">
-
-                            <nav>
-                                {/* <ProcButtons /> */}
-                                <br />
-                                <PlayButton onPlay={handlePlay} onStop={handleStop}/>
-                            </nav>
+                        <div className="col-md-4" id="controls">
+                        <br />
+                        <br />
+                        <DJControls 
+                            bpm={bpm} 
+                            onBpmChange={handleBpm} 
+                            onMuteChange={handleMute} 
+                            onVolumeChange={handleVolume}
+                        />
+                        <br />
+                        <div className="d-flex justify-content-center flex-column">
+                            <PlayButton onPlay={handlePlay} onStop={handleStop} />
                         </div>
-                    </div>
-                    <div className="row">
-                        <div className="col-md-8" style={{ maxHeight: '50vh', overflowY: 'auto' }}>
-                            <div id="editor" />
-                            <div id="output" />
-                        </div>
-                        <div className="col-md-4">
-                            <DJControls 
-                                bpm={bpm} 
-                                onBpmChange={handleBpm} 
-                                onMuteChange={handleMute} 
-                                onVolumeChange={handleVolume}
-                            />
                         </div>
                     </div>
                 </div>

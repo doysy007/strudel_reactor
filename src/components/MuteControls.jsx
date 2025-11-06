@@ -1,6 +1,8 @@
 import React from 'react';
 
 function MuteControls({ onMuteChange }) {
+    
+    // Handlers to pass instrument and mute state to App.js.
     function handleDrum1Mute(event) {
         onMuteChange('drums1', event.target.checked);
     }
