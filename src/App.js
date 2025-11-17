@@ -13,6 +13,7 @@ import DJControls from './components/DJControls';
 import PlayButton from './components/PlayButton';
 import ProcButtons from './components/ProcButtons';
 import PreProcessText from './components/PreProcessText';
+import { Preprocess } from './utils/PreprocessLogic';
 
 let globalEditor = null;
 
@@ -70,6 +71,8 @@ export default function StrudelDemo() {
     const hasRun = useRef(false);
 
     const handlePlay = () => {
+            let outputText = Preprocess({ inputText: procText, volume: volume});
+            globalEditor.setCode(outputText);
             globalEditor.evaluate();
         };
 
@@ -77,7 +80,18 @@ export default function StrudelDemo() {
             globalEditor.stop();
         };
 
-    const [songText, setSongText] = useState(stranger_tune);
+    const [procText, setProcText] = useState(stranger_tune);
+
+    const [volume, setVolume] = useState(1);
+
+    const [state, setState] = useState("stop");
+    // const [procText, setProcText] = useState(algro_dave_tune);
+
+    useEffect(() => {
+        if (state === "play") {
+            handlePlay();
+        }
+    }, [volume])
 
     useEffect(() => {
 
@@ -116,8 +130,8 @@ export default function StrudelDemo() {
             // SetupButtons()
             // Proc()
         }
-        globalEditor.setCode(songText);
-    }, [songText]);
+        globalEditor.setCode(procText);
+    }, [procText]);
 
 
     return (
@@ -128,14 +142,12 @@ export default function StrudelDemo() {
                 <div className="container-fluid">
                     <div className="row">
                         <div className="col-md-8" style={{ maxHeight: '50vh', overflowY: 'auto' }}>
-                            <PreProcessText defaultValue={songText} onChange={(e) => setSongText(e.target.value)}/>
+                            <PreProcessText defaultValue={procText} onChange={(e) => setProcText(e.target.value)}/>
                         </div>
                         <div className="col-md-4">
 
                             <nav>
-                                <ProcButtons />
-                                <br />
-                                <PlayButton onPlay={handlePlay} onStop={handleStop}/>
+                                <PlayButton onPlay={() => {setState("play"); handlePlay() }} onStop={() => {setState("stop"); handleStop() }}/>
                             </nav>
                         </div>
                     </div>
@@ -145,7 +157,7 @@ export default function StrudelDemo() {
                             <div id="output" />
                         </div>
                         <div className="col-md-4">
-                            <DJControls />
+                            <DJControls volume={volume} onVolumeChange={(e) => setVolume(e.target.value)}/>
                         </div>
                     </div>
                 </div>
