@@ -81,32 +81,34 @@ note(pick(arpeggiator1, "<0 1 2 3>/2"))
 ${muteDrums1}drums:
 stack(
   s("tech:5")
-  .postgain(6*${drums1Gain})
+  .postgain(6)
   .pcurve(2)
   .pdec(1)
-  .struct(pick(drum_structure, pattern)),
+  .struct(pick(drum_structure, pattern))
+  .gain(1*${drums1Gain}),
 
   s("sh").struct("[x!3 ~!2 x!10 ~]")
-  .postgain(0.5*${drums1Gain}).lpf(7000)
+  .postgain(0.5).lpf(7000)
   .bank("RolandTR808")
-  .speed(0.8).jux(rev).room(sine.range(0.1,0.4)).gain(0.6),
+  .speed(0.8).jux(rev).room(sine.range(0.1,0.4)).gain(0.6*${drums1Gain}),
 
   s("{~ ~ rim ~ cp ~ rim cp ~!2 rim ~ cp ~ < rim ~ >!2}%8 *2")
   .bank("[KorgDDM110, OberheimDmx]").speed(1.2)
-  .postgain(.25*${drums1Gain}),
+  .postgain(.25)
+  .gain(1*${drums1Gain}),
 )
 
 ${muteDrums2}drums2: 
 stack(
-  s("[~ hh]*4").bank("RolandTR808").room(0.3).speed(0.75).gain(${1.2 * drums2Gain}),
+  s("[~ hh]*4").bank("RolandTR808").room(0.3).speed(0.75).gain(1.2 * ${drums2Gain}),
   s("hh").struct("x*16").bank("RolandTR808")
-  .gain(${0.6 * drums2Gain})
+  .gain(0.6 * ${drums2Gain})
   .jux(rev)
   .room(sine.range(0.1,0.4))
   .postgain(1),
   
   s("[psr:[2|5|6|7|8|9|12|24|25]*16]?0.1")
-  .gain(${0.1 * drums2Gain})
+  .gain(0.1 * ${drums2Gain})
   .postgain(pick(gain_patterns, pattern))
   .hpf(1000)
   .speed(0.5)

@@ -1,4 +1,6 @@
-import './App.css';
+import './css/App.css';
+import nedDancingImg from './nedDancing.gif';
+import nedNotDancingImg from './nedNotDancing.png';
 import { useEffect, useRef, useState } from "react";
 import { StrudelMirror } from '@strudel/codemirror';
 import { evalScope, set } from '@strudel/core';
@@ -69,6 +71,10 @@ export default function StrudelDemo() {
     // State variables
     const hasRun = useRef(false);
 
+    const [expandedPane, setExpandedPane] = useState(null);
+
+    const [nedDancing, setNedDancing] = useState(false);
+
     // Bpm State variable
     const [bpm, setBpm] = useState(140);
 
@@ -95,6 +101,7 @@ export default function StrudelDemo() {
         if (globalEditor != null) {
             globalEditor.evaluate(); // Starts playing the song
             setIsPlaying(true); // Sets isPlaying state to true
+            setNedDancing(true); // Show dancing gif while playing
         }
     };
 
@@ -103,6 +110,15 @@ export default function StrudelDemo() {
         if (globalEditor != null) {
             globalEditor.stop(); // Stops playing the song
             setIsPlaying(false); // Sets isPlaying state to false
+            setNedDancing(false); // Show idle image when stopped
+        }
+    };
+
+    // Scroll to controls section
+    const handleScrollToControls = () => {
+        const controls = document.getElementById('controls');
+        if (controls) {
+            controls.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
     };
 
@@ -231,23 +247,60 @@ export default function StrudelDemo() {
         }
     }, [songText]);
 
-    return (
+     return (
         <div>
-            <h2 className="title">Strudel Demo &#127925;</h2>
+            <div className="title-card">
+                <h2>Strudel Demo &#127925;</h2>
+            </div>
             <main>
                 <div className="container-fluid">
-                    <div className="row">
-                        <div className="col-md-8">
-                            <div style={{ maxHeight: '50vh', overflowY: 'auto' }}>
-                                <PreProcessText defaultValue={songText} onChange={(e) => setSongText(e.target.value)}/>
+                    <div className="row" >
+                        <div className={`${expandedPane ? 'col-12' : 'col-4'} ${expandedPane && expandedPane === 'strudel' ? 'd-none' : ''}`}>
+                            <h2 className="form-label preprocess-label title">Text to preprocess:</h2>
+                            <div style={{ maxHeight: '80vh', overflowY:'auto'}}>
+                                <PreProcessText defaultValue={songText} onChange={(e) => setSongText(e.target.value)} />
                             </div>
-                            <br />
-                            <div style={{ maxHeight: '50vh', overflowY: 'auto' }}>
+                            <div className="d-flex justify-content-center mt-3">
+                                {expandedPane === 'preprocess' ? (
+                                    <button className="btn btn-secondary" onClick={() => setExpandedPane(null)}>Exit Fullscreen</button>
+                                ) : (
+                                    <button className="btn btn-secondary" onClick={() => setExpandedPane('preprocess')}>Expand Pre-Process Text</button>
+                                )}
+                            </div>
+                        </div>
+                        <div className={`col-4 d-flex flex-column align-items-center ${expandedPane ? 'd-none' : ''}`}>
+                            {nedDancing ? (
+                                <img className="nedImage" src={nedDancingImg} alt="Ned dancing" />
+                            ) : (
+                                <img className="nedImage" src={nedNotDancingImg} alt="Ned not dancing" />
+                            )}
+                            <div className="d-flex justify-content-center flex-column" id="playControls">
+                                <div className="btn-group">
+                                    <PlayButton onPlay={handlePlay} onStop={handleStop} />
+                                </div>
+                            </div>
+                            <div className="d-flex justify-content-center flex-column" id="controlsButton">
+                                <button className="btn btn-secondary mb-3" onClick={handleScrollToControls}>
+                                    Click Here to View DJControls
+                                </button>
+                            </div>
+                        </div>
+                        <div className={`${expandedPane ? 'col-12' : 'col-4'} ${expandedPane && expandedPane === 'preprocess' ? 'd-none' : ''}`}>
+                            <h2 className="title">Strudel Output:</h2>
+                            <div style={{ maxHeight: '60vh', overflowY: 'auto' }}>
                                 <div id="editor" />
                                 <div id="output" />
                             </div>
+                            <div className="d-flex justify-content-center">
+                                {expandedPane === 'strudel' ? (
+                                    <button className="btn btn-secondary mt-2" onClick={() => setExpandedPane(null)}>Exit Fullscreen</button>
+                                ) : (
+                                    <button className="btn btn-secondary mt-2" onClick={() => setExpandedPane('strudel')}>Expand Strudel Output</button>
+                                )}
+                            </div>
                         </div>
-                        <div className="col-md-4" id="controls">
+                    </div>
+                    <div className="row" id="controls">
                         <br />
                         <br />
                         <DJControls 
@@ -257,11 +310,7 @@ export default function StrudelDemo() {
                             onVolumeChange={handleVolume}
                         />
                         <br />
-                        <div className="d-flex justify-content-center flex-column">
-                            <PlayButton onPlay={handlePlay} onStop={handleStop} />
-                        </div>
-                        </div>
-                    </div>
+                    </div>    
                 </div>
                 <canvas id="roll"></canvas>
             </main >

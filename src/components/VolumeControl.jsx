@@ -31,7 +31,7 @@ function VolumeControl({ onVolumeChange }) {
                 type="range" 
                 className="form-range" 
                 min="0" 
-                max="3" 
+                max="2" 
                 step="0.1" 
                 id="volume_range"
                 value={volume}
