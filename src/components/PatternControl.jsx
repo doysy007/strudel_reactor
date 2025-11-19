@@ -1,5 +1,7 @@
 import React from 'react';
 
+// Shows the select list options to change drum and bass pattern.
+// This function takes in the current pattern values and passes the value from the selected option and passed to DJControls component.
 function PatternControl({ onDrumPatternChange, onBassPatternChange, drumPattern, bassPattern }) {
     return (
         <>

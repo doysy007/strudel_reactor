@@ -5,6 +5,7 @@ import VolumeControl from './VolumeControl';
 import PatternControl from './PatternControl';
 
 // Parent component for BPMControl, MuteControls and VolumeControl.
+// Displays the control components in a boostrap card layout.
 function DJControls({ bpm, onBpmChange, onMuteChange, onVolumeChange, onDrumPatternChange, onBassPatternChange, drumPattern, bassPattern }) {
     return (
         <div className="container-fluid">

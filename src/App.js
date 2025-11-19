@@ -14,8 +14,10 @@ import console_monkey_patch, { getD3Data } from './console-monkey-patch';
 import DJControls from './components/DJControls';
 import PlayButton from './components/PlayButton';
 import PreProcessText from './components/PreProcessText';
+import Presets from './components/Presets';
 
 let globalEditor = null;
+stranger_tune({ bpm: 140})
 
 const handleD3Data = (event) => {
     console.log(event.detail);
@@ -53,7 +55,8 @@ export default function StrudelDemo() {
     const [isPlaying, setIsPlaying] = useState(false);
 
     // Song Text State variable
-    const [songText, setSongText] = useState(stranger_tune({ bpm }));
+    const [songText, setSongText] = useState(stranger_tune({}));
+    const [preprocessText, setPreprocessText] = useState(stranger_tune({}));
 
     // Play button handler
     const handlePlay = () => {
@@ -77,6 +80,15 @@ export default function StrudelDemo() {
     const handleScrollToControls = () => {
         const controls = document.getElementById('controls');
         controls.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+
+    /**
+     * The loaded preset passes the preprocess text from Presets component
+     * and updates preprocess and strudel text.  
+    */ 
+    const onApplyPreset = (preProcessText) => {
+        setPreprocessText(preProcessText);
+        setSongText(preProcessText);
     };
 
     // Use effect updates the strudel code whenever any of the dependencies change.
@@ -104,13 +116,8 @@ export default function StrudelDemo() {
         });
 
         setSongText(updatedSongText); // Sets the current song text to the updated song text.
-
-        // Allows the changes to take effect immediately upon change.
-        if (globalEditor != null && isPlaying) {
-            globalEditor.setCode(updatedSongText);
-            globalEditor.evaluate();
-        }
-    }, [bpm, drum1IsMuted, drum2IsMuted, basslineIsMuted, mainArpIsMuted, basslineGain, mainArpGain, drums1Gain, drums2Gain, drumPattern, bassPattern, isPlaying]); // Dependencies list
+        setPreprocessText(updatedSongText); // Keeps preprocess text in sync with DJ controls.
+    }, [bpm, drum1IsMuted, drum2IsMuted, basslineIsMuted, mainArpIsMuted, basslineGain, mainArpGain, drums1Gain, drums2Gain, drumPattern, bassPattern]); // Dependencies list
 
     // Mute handler
     // Sets instrument mute states to true or false based 
@@ -192,11 +199,17 @@ export default function StrudelDemo() {
                     },
                 });
         }
-        // Keeps strudel output up to date with the songText.
+    }, []); // Effect runs at the start.
+
+    // Updates the strudel text and starts song again if isPlaying is true when songText or isPlaying changes state.
+    useEffect(() => {
         if (globalEditor != null) {
             globalEditor.setCode(songText);
+            if (isPlaying) {
+                globalEditor.evaluate();
+            }
         }
-    }, [songText]); // Effect runs everytime songText changes.
+    }, [songText, isPlaying]);
 
      return (
         <div>
@@ -211,7 +224,10 @@ export default function StrudelDemo() {
                         <div className={`${expandedPane ? 'col-12' : 'col-4'} ${expandedPane && expandedPane === 'strudel' ? 'd-none' : ''}`}>
                             <h2 className="form-label preprocess-label title">Text to preprocess:</h2>
                             <div style={{ maxHeight: '80vh', overflowY:'auto'}}>
-                                <PreProcessText defaultValue={songText} onChange={(e) => setSongText(e.target.value)} />
+                                {/**
+                                 * Sets preprocess text to preprocessText state and when changed sets the new state.
+                                 */}
+                                <PreProcessText value={preprocessText} onChange={(e) => setPreprocessText(e.target.value)} />
                             </div>
                             <div className="d-flex justify-content-center mt-3">
                                 {/* Shows button for expanding pane or exiting pane view. */}
@@ -233,13 +249,27 @@ export default function StrudelDemo() {
                             )}
                             <div className="d-flex justify-content-center flex-column" id="playControls">
                                 <div className="btn-group">
+                                    {/**
+                                     * Buttons for playing and stopping the strudel music.
+                                     */}
                                     <PlayButton onPlay={handlePlay} onStop={handleStop} />
                                 </div>
                             </div>
                             <div className="d-flex justify-content-center flex-column" id="controlsButton">
-                                <button className="btn btn-secondary mb-3" onClick={handleScrollToControls}>
-                                    Click Here to View DJControls
-                                </button>
+                                {/**
+                                 * Button applies the preprocess text to the strudel output.
+                                 */}
+                                <div className="btn-group mb-3" role="group">
+                                    <button className="btn btn-success" onClick={() => {setSongText(preprocessText)}}>
+                                        Apply Preprocess
+                                    </button>
+                                    {/**
+                                     * Button to scroll down the page to the controls section.
+                                     */}
+                                    <button className="btn btn-secondary" onClick={handleScrollToControls}>
+                                        Click Here to View DJControls
+                                    </button>
+                                </div>
                             </div>
                         </div>
                         {/* If expandedPane is true and doesn't equal preprocess then expands strudel output column to take up entire row.
@@ -260,9 +290,14 @@ export default function StrudelDemo() {
                             </div>
                         </div>
                     </div>
+                    {/* Presets component displayed here */}
+                    <Presets preProcessText={preprocessText} onApplyPreset={onApplyPreset} />
                     <div className="row" id="controls">
                         <br />
                         <br />
+                        {/**
+                         * All control buttons for editing the strudel song.
+                         */}
                         <DJControls 
                             bpm={bpm} 
                             onBpmChange={(newBpm) => setBpm(newBpm)} 
