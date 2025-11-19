@@ -27,13 +27,14 @@ export default function Presets({ preProcessText, onApplyPreset }) {
     /**
      * Saves/Overwrites the preset selected.
      * Loops through all the saved presets.
-     * If the current preset.name matches the selected presetName then 
+     * If the current preset.name matches the selected presetName,
+     * then returns updated preset, replacing old one.
      */
     const savePreset = () => {
         setPresetList((presetList) =>
             presetList.map((preset) =>
                 {if (preset.name === presetName) {
-                    return { ...preset, text: preProcessText }
+                    return { name: presetName, text: preProcessText }
                 } else {
                     return preset;
                 }
@@ -53,6 +54,11 @@ export default function Presets({ preProcessText, onApplyPreset }) {
 
     return (
         <div>
+        {/**
+         * Presets list
+         * Displays the list of presets by looping through presetList
+         * When a preset list is chosen updated the value to the presetName.
+         */}
         <select className="form-select m-1" value={presetName} onChange={(e) => setPresetName(e.target.value)}>
             {presetList.map((preset) => (
                 <option key={preset.name} value={preset.name}>
@@ -60,6 +66,9 @@ export default function Presets({ preProcessText, onApplyPreset }) {
                 </option>
             ))}
         </select>
+        {/**
+         * Calls the loadPreset function which returns the selected preset preprocess text as argument for onApplyPreset.
+         */}
         <button className="btn btn-success m-1" onClick={() => onApplyPreset(loadPreset(presetName))}>Load</button>
         <button className="btn btn-warning m-1" onClick={savePreset}>Save</button>
         <button className="btn btn-primary m-1" onClick={addPreset}>Add</button>

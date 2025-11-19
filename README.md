@@ -68,3 +68,40 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+## Components
+
+### PreProcessText
+The preprocess text is used to update the strudel output text box so users can fine tune their music and are not limited to the audio controls.
+
+### DJControls
+The DJControls is the parent component which holds all the controls which edit and change the way the song can sound. Child components in it are the MuteControls, PatternControl, BPMControl and VolumeControl child components.
+
+### MuteControls
+The MuteControls can mute each instrument in the song using a switch input button.
+
+### PatternControl
+The PatternControl allows uers to change the tune of the bassline instrument and the drums by selecting the pattern listed from the select list under bassline and drums.
+
+### BPMControl
+The BPM control allows users to change the BPM of the song.
+
+### Volume Control
+The Volume control allow susers to adjust the volume using a slider for each instrument or all instruments if they would like. The user can select the instrument they desire to mute in a select list.
+
+## App.js
+
+The App.js holds most of the state and use effects. 
+
+This file allows the user to: 
+- Play and stop the song
+- Expand either the strudel text or preprocess text for better visibility
+- Navigate to the DJControls component section
+- Load, Save or Add a preset
+- See Ned Flanders dancing when while the song is playing
+- Apply changes to the song in real time without stopping and playing the song again
+- Apply just the preprocess text changes
+
+### Video Demonstartion
+Video goes over the functionality of the website.
+Link: https://youtu.be/0VdjtvrpYYI
