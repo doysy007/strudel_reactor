@@ -12,7 +12,9 @@ export function stranger_tune({
   basslineGain = 1.0,
   mainArpGain = 1.0,
   drums1Gain = 1.0,
-  drums2Gain = 1.0
+  drums2Gain = 1.0,
+  drumPattern = 0,
+  bassPattern = 0
 }) {
     return `setcpm(${bpm}/4)
 
@@ -52,8 +54,8 @@ const arpeggiator2 = [
 ]
 
 
-const pattern = 0
-const bass = 0
+const pattern = ${drumPattern}
+const bass = ${bassPattern}
 
 ${muteBassline}bassline:
 note(pick(basslines, bass))

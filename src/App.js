@@ -3,7 +3,7 @@ import nedDancingImg from './nedDancing.gif';
 import nedNotDancingImg from './nedNotDancing.png';
 import { useEffect, useRef, useState } from "react";
 import { StrudelMirror } from '@strudel/codemirror';
-import { evalScope, set } from '@strudel/core';
+import { evalScope, patt, set } from '@strudel/core';
 import { drawPianoroll } from '@strudel/draw';
 import { initAudioOnFirstClick } from '@strudel/webaudio';
 import { transpiler } from '@strudel/transpiler';
@@ -13,7 +13,6 @@ import { stranger_tune } from './tunes';
 import console_monkey_patch, { getD3Data } from './console-monkey-patch';
 import DJControls from './components/DJControls';
 import PlayButton from './components/PlayButton';
-import ProcButtons from './components/ProcButtons';
 import PreProcessText from './components/PreProcessText';
 
 let globalEditor = null;
@@ -21,50 +20,6 @@ let globalEditor = null;
 const handleD3Data = (event) => {
     console.log(event.detail);
 };
-
-// export function SetupButtons() {
-
-//     document.getElementById('play').addEventListener('click', () => globalEditor.evaluate());
-//     document.getElementById('stop').addEventListener('click', () => globalEditor.stop());
-//     document.getElementById('process').addEventListener('click', () => {
-//         Proc()
-//     }
-//     )
-//     document.getElementById('process_play').addEventListener('click', () => {
-//         if (globalEditor != null) {
-//             Proc()
-//             globalEditor.evaluate()
-//         }
-//     }
-//     )
-// }
-
-
-// export function ProcAndPlay() {
-//     if (globalEditor != null && globalEditor.repl.state.started == true) {
-//         console.log(globalEditor)
-//         Proc()
-//         globalEditor.evaluate();
-//     }
-// }
-
-// export function Proc() {
-
-//     let proc_text = document.getElementById('proc').value
-//     let proc_text_replaced = proc_text.replaceAll('<p1_Radio>', ProcessText);
-//     ProcessText(proc_text);
-//     globalEditor.setCode(proc_text_replaced)
-// }
-
-// export function ProcessText(match, ...args) {
-
-//     let replace = ""
-//     if (document.getElementById('flexRadioDefault2').checked) {
-//         replace = "_"
-//     }
-
-//     return replace
-// }
 
 export default function StrudelDemo() {
 
@@ -89,6 +44,10 @@ export default function StrudelDemo() {
     const [mainArpGain, setMainArpGain] = useState(1.0);
     const [drums1Gain, setDrums1Gain] = useState(1.0);
     const [drums2Gain, setDrums2Gain] = useState(1.0);
+
+    // Pattern State variables
+    const [bassPattern, setBassPattern] = useState(0);
+    const [drumPattern, setDrumPattern] = useState(0);
 
     // Playing State variable
     const [isPlaying, setIsPlaying] = useState(false);
@@ -117,9 +76,7 @@ export default function StrudelDemo() {
     // Scroll to controls section
     const handleScrollToControls = () => {
         const controls = document.getElementById('controls');
-        if (controls) {
-            controls.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
+        controls.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
 
     // Use effect updates the strudel code whenever any of the dependencies change.
@@ -131,7 +88,7 @@ export default function StrudelDemo() {
         const muteBassline = (basslineIsMuted) ? "_" : "";
         const muteMainArp = (mainArpIsMuted) ? "_" : "";
         
-        // Updates the song text based on current mute settings.
+        // Updates the song text based on current dj control settings.
         const updatedSongText = stranger_tune({ 
             bpm, 
             muteDrums1, 
@@ -141,7 +98,9 @@ export default function StrudelDemo() {
             basslineGain,
             mainArpGain,
             drums1Gain,
-            drums2Gain
+            drums2Gain,
+            drumPattern,
+            bassPattern
         });
 
         setSongText(updatedSongText); // Sets the current song text to the updated song text.
@@ -151,13 +110,7 @@ export default function StrudelDemo() {
             globalEditor.setCode(updatedSongText);
             globalEditor.evaluate();
         }
-    }, [bpm, drum1IsMuted, drum2IsMuted, basslineIsMuted, mainArpIsMuted, basslineGain, mainArpGain, drums1Gain, drums2Gain, isPlaying]);
-
-
-    // Bpm handler
-    function handleBpm(newBpm) {
-        setBpm(newBpm);
-    }
+    }, [bpm, drum1IsMuted, drum2IsMuted, basslineIsMuted, mainArpIsMuted, basslineGain, mainArpGain, drums1Gain, drums2Gain, drumPattern, bassPattern, isPlaying]); // Dependencies list
 
     // Mute handler
     // Sets instrument mute states to true or false based 
@@ -205,6 +158,7 @@ export default function StrudelDemo() {
         }
     }
 
+
     useEffect(() => {
 
         if (!hasRun.current) {
@@ -237,15 +191,12 @@ export default function StrudelDemo() {
                         await Promise.all([loadModules, registerSynthSounds(), registerSoundfonts()]);
                     },
                 });
-                
-            // document.getElementById('proc').value = songText;
-            // SetupButtons()
-            // Proc()
         }
+        // Keeps strudel output up to date with the songText.
         if (globalEditor != null) {
             globalEditor.setCode(songText);
         }
-    }, [songText]);
+    }, [songText]); // Effect runs everytime songText changes.
 
      return (
         <div>
@@ -255,12 +206,15 @@ export default function StrudelDemo() {
             <main>
                 <div className="container-fluid">
                     <div className="row" >
+                        {/* If expandedPane is true and doesn't equal strudel then expands preprocess text column to take up entire row.
+                        Otherwise if expandedPane equals strudel then hides this column.  */}
                         <div className={`${expandedPane ? 'col-12' : 'col-4'} ${expandedPane && expandedPane === 'strudel' ? 'd-none' : ''}`}>
                             <h2 className="form-label preprocess-label title">Text to preprocess:</h2>
                             <div style={{ maxHeight: '80vh', overflowY:'auto'}}>
                                 <PreProcessText defaultValue={songText} onChange={(e) => setSongText(e.target.value)} />
                             </div>
                             <div className="d-flex justify-content-center mt-3">
+                                {/* Shows button for expanding pane or exiting pane view. */}
                                 {expandedPane === 'preprocess' ? (
                                     <button className="btn btn-secondary" onClick={() => setExpandedPane(null)}>Exit Fullscreen</button>
                                 ) : (
@@ -268,7 +222,10 @@ export default function StrudelDemo() {
                                 )}
                             </div>
                         </div>
+                        {/* This is the middle pane so if expandedPane is true then hides this pane. */}
                         <div className={`col-4 d-flex flex-column align-items-center ${expandedPane ? 'd-none' : ''}`}>
+                            {/* If song is playing (nedDancing is true) then shows gif of Ned dancing.
+                            Otherwise, shows png (still picture) of Ned dancing.*/}
                             {nedDancing ? (
                                 <img className="nedImage" src={nedDancingImg} alt="Ned dancing" />
                             ) : (
@@ -285,6 +242,8 @@ export default function StrudelDemo() {
                                 </button>
                             </div>
                         </div>
+                        {/* If expandedPane is true and doesn't equal preprocess then expands strudel output column to take up entire row.
+                        Otherwise if expandedPane equals preprocess then hides this column.  */}
                         <div className={`${expandedPane ? 'col-12' : 'col-4'} ${expandedPane && expandedPane === 'preprocess' ? 'd-none' : ''}`}>
                             <h2 className="title">Strudel Output:</h2>
                             <div style={{ maxHeight: '60vh', overflowY: 'auto' }}>
@@ -292,6 +251,7 @@ export default function StrudelDemo() {
                                 <div id="output" />
                             </div>
                             <div className="d-flex justify-content-center">
+                                {/* Shows button for expanding pane or exiting pane view. */}
                                 {expandedPane === 'strudel' ? (
                                     <button className="btn btn-secondary mt-2" onClick={() => setExpandedPane(null)}>Exit Fullscreen</button>
                                 ) : (
@@ -305,9 +265,13 @@ export default function StrudelDemo() {
                         <br />
                         <DJControls 
                             bpm={bpm} 
-                            onBpmChange={handleBpm} 
+                            onBpmChange={(newBpm) => setBpm(newBpm)} 
                             onMuteChange={handleMute} 
                             onVolumeChange={handleVolume}
+                            onBassPatternChange={(patternNumber) => setBassPattern(patternNumber)}
+                            onDrumPatternChange={(patternNumber) => setDrumPattern(patternNumber)}
+                            bassPattern={bassPattern}
+                            drumPattern={drumPattern}
                         />
                         <br />
                     </div>    
