@@ -4,15 +4,15 @@ Parameters allow control over the strudel tune playback.
 Returns a template literal of the strudel tune to play.
 */
 export function stranger_tune({ 
-  bpm, 
-  muteDrums1,
-  muteDrums2, 
-  muteBassline, 
-  muteMainArp,
-  basslineGain,
-  mainArpGain,
-  drums1Gain,
-  drums2Gain
+  bpm = 140, 
+  muteDrums1 = "",
+  muteDrums2 = "", 
+  muteBassline = "", 
+  muteMainArp = "",
+  basslineGain = 1.0,
+  mainArpGain = 1.0,
+  drums1Gain = 1.0,
+  drums2Gain = 1.0
 }) {
     return `setcpm(${bpm}/4)
 
